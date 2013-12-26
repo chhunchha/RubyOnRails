@@ -1,13 +1,23 @@
 class VisitorsController < ApplicationController
 
-	def new 
-		@owner = Owner.new
-		#explicit code for rendering, otherwsie as new method will use new.html.erb
-		#render 'visitors/new'
-		if @owner.countdown < 50
-			flash.now[:alert] = 'My birthday is soon.'
+	def new
+		@visitor = Visitor.new
+	end
+
+	def create
+		@visitor = Visitor.new(secure_params)
+		if @visitor.valid?
+			@visitor.subscribe
+			flash[:notice] = "Signed up #{@visitor.email}."
+			redirect_to root_path
 		else
-			flash.now[:alert] = 'My birthday is far far away.'
+			render :new
 		end
+	end
+
+	private
+
+	def secure_params
+		params.require(:visitor).permit(:email)
 	end
 end
